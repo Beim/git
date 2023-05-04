@@ -1,0 +1,18 @@
+@startuml file_tree_commit_relationship
+
+class file_v1
+class tree_v1
+class commit_v1
+class file_v2
+class tree_v2
+class commit_v2
+
+file_v1 <-- tree_v1
+tree_v1 <-- commit_v1
+file_v2 <-- tree_v2
+tree_v2 <-- commit_v2
+tree_v1 <-- commit_v2
+
+
+
+@enduml

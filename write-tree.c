@@ -54,11 +54,11 @@ int main(int argc, char **argv)
 		offset += 20;
 	}
 
-	i = prepend_integer(buffer, offset - ORIG_OFFSET, ORIG_OFFSET);
+	i = prepend_integer(buffer, offset - ORIG_OFFSET, ORIG_OFFSET); // append length to orig_offset
 	i -= 5;
-	memcpy(buffer+i, "tree ", 5);
+	memcpy(buffer+i, "tree ", 5); // append tag and space
 
-	buffer += i;
+	buffer += i; // move buffer pointer to start of "tree"
 	offset -= i;
 
 	write_sha1_file(buffer, offset);

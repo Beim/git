@@ -70,16 +70,16 @@ char *sha1_file_name(unsigned char *sha1)
 		name = base + len + 1;
 	}
 	for (i = 0; i < 20; i++) {
-		static char hex[] = "0123456789abcdef";
+		static char hex[] = "0123456789abcdef"; // convert hex number to str
 		unsigned int val = sha1[i];
 		char *pos = name + i*2 + (i > 0);
-		*pos++ = hex[val >> 4];
-		*pos = hex[val & 0xf];
+		*pos++ = hex[val >> 4]; // get high 4bits
+		*pos = hex[val & 0xf]; // get low 4bits
 	}
 	return base;
 }
 
-void * read_sha1_file(unsigned char *sha1, char *type, unsigned long *size)
+void * read_sha1_file(unsigned char *sha1, char *type, unsigned long *size) // read type(e.g. blob) and size of content, and return content as void *buf
 {
 	z_stream stream;
 	char buffer[8192];
@@ -120,7 +120,7 @@ void * read_sha1_file(unsigned char *sha1, char *type, unsigned long *size)
 
 	memcpy(buf, buffer + bytes, stream.total_out - bytes);
 	bytes = stream.total_out - bytes;
-	if (bytes < *size && ret == Z_OK) {
+	if (bytes < *size && ret == Z_OK) { // what's this????
 		stream.next_out = buf + bytes;
 		stream.avail_out = *size - bytes;
 		while (inflate(&stream, Z_FINISH) == Z_OK)
@@ -197,7 +197,7 @@ static int verify_hdr(struct cache_header *hdr, unsigned long size)
 	SHA1_Update(&c, hdr, offsetof(struct cache_header, sha1));
 	SHA1_Update(&c, hdr+1, size - sizeof(*hdr));
 	SHA1_Final(sha1, &c);
-	if (memcmp(sha1, hdr->sha1, 20))
+	if (memcmp(sha1, hdr->sha1, 20)) // check sha1(signature, version, entries, data) equals to hdr->sha1
 		return error("bad header sha1");
 	return 0;
 }
@@ -208,7 +208,7 @@ int read_cache(void)
 	struct stat st;
 	unsigned long size, offset;
 	void *map;
-	struct cache_header *hdr;
+	struct cache_header *hdr; // header
 
 	errno = EBUSY;
 	if (active_cache)
@@ -224,18 +224,19 @@ int read_cache(void)
 		return (errno == ENOENT) ? 0 : error("open failed");
 
 	map = (void *)-1;
-	if (!fstat(fd, &st)) {
+	int res_fstat = fstat(fd, &st);
+	if (!res_fstat) {
 		map = NULL;
-		size = st.st_size;
+		size = st.st_size; // cache size in bytes
 		errno = EINVAL;
 		if (size > sizeof(struct cache_header))
-			map = mmap(NULL, size, PROT_READ, MAP_PRIVATE, fd, 0);
+			map = mmap(NULL, size, PROT_READ, MAP_PRIVATE, fd, 0); // map file to memory
 	}
 	close(fd);
 	if (-1 == (int)(long)map)
 		return error("mmap failed");
 
-	hdr = map;
+	hdr = map; // cache_header *
 	if (verify_hdr(hdr, size) < 0)
 		goto unmap;
 

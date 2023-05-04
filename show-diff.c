@@ -73,8 +73,8 @@ int main(int argc, char **argv)
 		for (n = 0; n < 20; n++)
 			printf("%02x", ce->sha1[n]);
 		printf("\n");
-		new = read_sha1_file(ce->sha1, type, &size);
-		show_differences(ce, &st, new, size);
+		new = read_sha1_file(ce->sha1, type, &size); // set type(e.g. blob) and size, return cached file content as void *new
+		show_differences(ce, &st, new, size); // `new` is actually old_contents
 		free(new);
 	}
 	return 0;

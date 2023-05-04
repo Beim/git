@@ -23,7 +23,7 @@ static int cache_name_pos(const char *name, int namelen)
 	last = active_nr;
 	while (last > first) {
 		int next = (last + first) >> 1;
-		struct cache_entry *ce = active_cache[next];
+		struct cache_entry *ce = active_cache[next]; // get existing cache entry
 		int cmp = cache_name_compare(name, namelen, ce->name, ce->namelen);
 		if (!cmp)
 			return -next-1;
@@ -150,7 +150,7 @@ static int add_file_to_cache(char *path)
 	ce->st_size = st.st_size;
 	ce->namelen = namelen;
 
-	if (index_fd(path, namelen, ce, fd, &st) < 0)
+	if (index_fd(path, namelen, ce, fd, &st) < 0) // set sha1, write blob to object database
 		return -1;
 
 	return add_cache_entry(ce);

@@ -23,14 +23,14 @@ static void init_buffer(char **bufp, unsigned int *sizep)
 static void add_buffer(char **bufp, unsigned int *sizep, const char *fmt, ...)
 {
 	char one_line[2048];
-	va_list args;
+	va_list args; // variable arguments
 	int len;
 	unsigned long alloc, size, newsize;
 	char *buf;
 
-	va_start(args, fmt);
-	len = vsnprintf(one_line, sizeof(one_line), fmt, args);
-	va_end(args);
+	va_start(args, fmt); // initialize `args` variable, `fmt` is the last variable that with known type
+	len = vsnprintf(one_line, sizeof(one_line), fmt, args); // format
+	va_end(args); // int vsnprintf(char *str, size_t size, const char *format, va_list ap);
 	size = *sizep;
 	newsize = size + len;
 	alloc = (size + 32767) & ~32767;
@@ -118,7 +118,7 @@ int main(int argc, char **argv)
 	if (argc < 2 || get_sha1_hex(argv[1], tree_sha1) < 0)
 		usage("commit-tree <sha1> [-p <sha1>]* < changelog");
 
-	for (i = 2; i < argc; i += 2) {
+	for (i = 2; i < argc; i += 2) { // if parent commit sha1 
 		char *a, *b;
 		a = argv[i]; b = argv[i+1];
 		if (!b || strcmp(a, "-p") || get_sha1_hex(b, parent_sha1[parents]))
@@ -130,23 +130,23 @@ int main(int argc, char **argv)
 	pw = getpwuid(getuid());
 	if (!pw)
 		usage("You don't exist. Go away!");
-	realgecos = pw->pw_gecos;
-	len = strlen(pw->pw_name);
+	realgecos = pw->pw_gecos; // pw_gecos: comment field
+	len = strlen(pw->pw_name); // pw_name: user name
 	memcpy(realemail, pw->pw_name, len);
 	realemail[len] = '@';
-	gethostname(realemail+len+1, sizeof(realemail)-len-1);
+	gethostname(realemail+len+1, sizeof(realemail)-len-1); // int gethostname(char *name, int namelen);
 	time(&now);
-	realdate = ctime(&now);
+	realdate = ctime(&now); // "Sun May  7 08:17:13 2023\n"
 
-	gecos = getenv("COMMITTER_NAME") ? : realgecos;
-	email = getenv("COMMITTER_EMAIL") ? : realemail;
-	date = getenv("COMMITTER_DATE") ? : realdate;
+	gecos = getenv("COMMITTER_NAME") ? : realgecos; // Ubuntu
+	email = getenv("COMMITTER_EMAIL") ? : realemail; // "ubuntu@ip-172-31-31-76"
+	date = getenv("COMMITTER_DATE") ? : realdate; // "Sun May  7 08:17:13 2023\n"
 
 	remove_special(gecos); remove_special(realgecos);
 	remove_special(email); remove_special(realemail);
-	remove_special(date); remove_special(realdate);
+	remove_special(date); remove_special(realdate); // "Sun May  7 08:17:13 2023"
 
-	init_buffer(&buffer, &size);
+	init_buffer(&buffer, &size); // init buffer with enough space, and leave space at the beginning (40 Bytes)
 	add_buffer(&buffer, &size, "tree %s\n", sha1_to_hex(tree_sha1));
 
 	/*
