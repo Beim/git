@@ -1,4 +1,4 @@
-CFLAGS=-g
+CFLAGS=-g -fcommon
 CC=gcc
 
 PROG=update-cache show-diff init-db write-tree read-tree commit-tree cat-file
@@ -8,7 +8,7 @@ all: $(PROG)
 install: $(PROG)
 	install $(PROG) $(HOME)/bin/
 
-LIBS= -lssl
+LIBS = -lssl -lcrypto -lz
 
 init-db: init-db.o
 
